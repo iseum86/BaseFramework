@@ -1,0 +1,17 @@
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Logs]/
+/[MemoryCaptures]/
+
+# Rider/VS files
+.idea/
+*.sln
+*.csproj
+*.unityproj
+
+# OS files
+.DS_Store
+Thumbs.db
