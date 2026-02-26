@@ -2,43 +2,47 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using Cysharp.Threading.Tasks;
 using Base.Utils;
 
 public class ResourceManager : BaseManager<ResourceManager>
 {
-    // 로드된 에셋들의 핸들을 관리하여 누수 방지
     private Dictionary<string, AsyncOperationHandle> _assetHandles = new();
 
-    public override void Init()
+    // 콜백 방식 대신 UniTask를 반환하여 await 가능하게 변경
+    public async UniTask<T> LoadAssetAsync<T>(string key) where T : Object
     {
-        base.Init();
-        // 필요한 경우 초기 에셋 카탈로그 업데이트 로직 추가
-    }
-
-    public void LoadAssetAsync<T>(string key, System.Action<T> callback) where T : Object
-    {
-        // 이미 로드된 에셋인지 확인
+        // 1. 이미 로드된 에셋인지 확인
         if (_assetHandles.TryGetValue(key, out var handle))
         {
-            callback?.Invoke(handle.Result as T);
-            return;
+            return handle.Result as T;
         }
 
-        // 비동기 로드 시작
+        // 2. 어드레서블 비동기 로드 시작
         var loadHandle = Addressables.LoadAssetAsync<T>(key);
-        loadHandle.Completed += (op) =>
+        
+        try
         {
-            if (op.Status == AsyncOperationStatus.Succeeded)
+            // ToUniTask를 사용하여 await (이전에 설정한 asmdef 참조 덕분에 가능합니다)
+            await loadHandle.ToUniTask();
+
+            if (loadHandle.Status == AsyncOperationStatus.Succeeded)
             {
-                _assetHandles[key] = op;
-                callback?.Invoke(op.Result);
+                _assetHandles[key] = loadHandle;
+                return loadHandle.Result;
             }
-            else
-            {
-                DevLog.Error($"에셋 로드 실패: {key}");
-                Addressables.Release(op);
-            }
-        };
+        }
+        catch (System.Exception e)
+        {
+            DevLog.Error($"{key} 에셋 로드 중 예외 발생: {e.Message}");
+        }
+
+        // 로드 실패 시 핸들 해제 및 null 반 Manuel
+        if (loadHandle.IsValid())
+        {
+            Addressables.Release(loadHandle);
+        }
+        return null;
     }
 
     public void UnloadAsset(string key)
@@ -55,7 +59,8 @@ public class ResourceManager : BaseManager<ResourceManager>
     {
         foreach (var handle in _assetHandles.Values)
         {
-            Addressables.Release(handle);
+            if (handle.IsValid())
+                Addressables.Release(handle);
         }
         _assetHandles.Clear();
         DevLog.Info("모든 리소스 해제 및 정리 완료");
