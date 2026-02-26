@@ -1,17 +1,22 @@
+# Unity Folders
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
 /[Bb]uild/
 /[Bb]uilds/
-/[Logs]/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
 /[MemoryCaptures]/
 
-# Rider/VS files
+# Rider / Visual Studio
 .idea/
 *.sln
 *.csproj
 *.unityproj
+*.suo
+*.user
+*.userprefs
 
-# OS files
+# OS Files
 .DS_Store
 Thumbs.db
