@@ -1,0 +1,32 @@
+{
+  "data": [
+    {
+      "tblidx": 1001,
+      "monsterName": "Slime",
+      "hp": 50,
+      "moveSpeed": 2.5,
+      "monsterType": 1
+    },
+    {
+      "tblidx": 1002,
+      "monsterName": "Goblin Archer",
+      "hp": 80,
+      "moveSpeed": 3.2,
+      "monsterType": 1
+    },
+    {
+      "tblidx": 2001,
+      "monsterName": "Orc Warrior",
+      "hp": 500,
+      "moveSpeed": 1.5,
+      "monsterType": 2
+    },
+    {
+      "tblidx": 3001,
+      "monsterName": "Ancient Dragon",
+      "hp": 10000,
+      "moveSpeed": 5.0,
+      "monsterType": 3
+    }
+  ]
+}
